@@ -20,7 +20,7 @@ app.get('/todos', function (req, res) {
 });
 //GET todos/:id
 app.get('/todos/:id', function (req, res) {
-	var todoId = parseInt(req.params.id);
+	var todoId = parseInt(req.params.id, 10);
 	var matchedTodo = _.findWhere(todos, { id : todoId});
 
 	if (matchedTodo) {
@@ -33,7 +33,7 @@ app.get('/todos/:id', function (req, res) {
 //POST todos/
 app.post('/todos', function (req, res) {
 	var body = _.pick(req.body, 'description', 'completed');
-	
+
 	if ( !_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
 		return res.status(400).send();
 	};
@@ -47,6 +47,18 @@ app.post('/todos', function (req, res) {
 	res.json(body);
 });
 
+app.delete('/todos/:id', function (req, res) {
+	var todoId = parseInt(req.params.id, 10);
+	var matchedTodo = _.findWhere(todos, {id : todoId});
+
+	if (matchedTodo) {
+		todos = _.without(todos, matchedTodo);
+		return res.json(matchedTodo);
+	} else {
+		return res.status(404).send();
+	};
+
+});
 
 app.listen(PORT, function () {
 	console.log('Todo API application started on port : ' + PORT);

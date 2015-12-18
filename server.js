@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 var db = require('./db.js');
+var bcrypt = require('bcrypt');
 
 var app = express();
 app.use(bodyParser.json());
@@ -117,17 +118,28 @@ app.put('/todos/:id', function(req, res) {
 	})
 });
 
-app.post('/users', function (req, res) {
+app.post('/users', function(req, res) {
 	var body = _.pick(req.body, 'email', 'password');
 
-	db.user.create(body).then( function(user) {
+	db.user.create(body).then(function(user) {
 		return res.status(200).json(user.toPublicJSON());
-	}, function (e) {
+	}, function(e) {
 		res.status(400).json(e);
 	});
 })
 
-db.sequelize.sync({force: true}).then(function() {
+//POST  /users/login
+app.post('/users/login', function(req, res) {
+	var body = _.pick(req.body, 'email', 'password');
+
+	db.user.authenticate(body).then( function (user) {
+		res.json(user.toPublicJSON());
+	}, function (e) {
+		res.status(401).send();
+	})
+})
+
+db.sequelize.sync({}).then(function() {
 	app.listen(PORT, function() {
 		console.log('Todo API application started on port : ' + PORT);
 	});

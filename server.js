@@ -162,7 +162,7 @@ app.post('/users/login', function(req, res) {
 })
 
 db.sequelize.sync({
-	//force: true
+	force: true
 }).then(function() {
 	app.listen(PORT, function() {
 		console.log('Todo API application started on port : ' + PORT);
